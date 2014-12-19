@@ -1,0 +1,27 @@
+#ServiceNow Domain
+domain: "https://dev119.service-now.com"
+
+#ServiceNow User
+username: "admin"
+
+#ServiceNow Password
+password: "changeme"
+
+#ServiceNow Version
+serviceNowVersion: "Dublin"
+
+#Proxy server host
+proxyHost: ""
+#Proxy server port
+proxyPort: ""
+#Proxy server user name
+proxyUser: ""
+#Proxy server password
+proxyPassword: ""
+
+#ServiceNow User Specific
+assignmentGroup: ""
+assignedTo: ""
+callerId: ""
+category: ""
+location: ""
