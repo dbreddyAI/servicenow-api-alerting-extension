@@ -24,7 +24,7 @@ public class HttpHandler {
     }
 
     /**
-     * Posts the data on VictorOps Endpoint.
+     * Posts the data to ServiceNow.
      *
      * @param data
      * @return

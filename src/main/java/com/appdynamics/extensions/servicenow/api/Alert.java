@@ -21,7 +21,7 @@ public class Alert {
     private String shortDescription;
 
     @JsonProperty("comments")
-    private String workNotes;
+    private String comments;
 
     @JsonProperty("location")
     private String location;
@@ -72,12 +72,12 @@ public class Alert {
         this.shortDescription = shortDescription;
     }
 
-    public String getWorkNotes() {
-        return workNotes;
+    public String getComments() {
+        return comments;
     }
 
-    public void setWorkNotes(String workNotes) {
-        this.workNotes = workNotes;
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
     public String getLocation() {

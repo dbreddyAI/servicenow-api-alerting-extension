@@ -25,13 +25,23 @@ public class ServiceNowAlertExtension {
     private static final String CONFIG_FILENAME = "." + File.separator + "conf" + File.separator + "config.yaml";
     private Configuration config;
     private static final String NEW_LINE = "\n";
+    private static final String SPACE = " ";
 
     final EventBuilder eventBuilder = new EventBuilder();
 
     public static void main(String[] args) {
-        Configuration config = YmlReader.readFromFile(CONFIG_FILENAME, Configuration.class);
-        ServiceNowAlertExtension serviceNowAlert = new ServiceNowAlertExtension(config);
-        serviceNowAlert.processAnEvent(args);
+        try {
+            Configuration config = YmlReader.readFromFile(CONFIG_FILENAME, Configuration.class);
+            ServiceNowAlertExtension serviceNowAlert = new ServiceNowAlertExtension(config);
+            boolean status = serviceNowAlert.processAnEvent(args);
+            if (status) {
+                logger.info("ServiceNow Extension completed successfully.");
+                return;
+            }
+        } catch (Exception e) {
+            logger.error("Error processing an event", e);
+        }
+        logger.error("ServiceNow Extension completed with errors");
     }
 
     public ServiceNowAlertExtension(Configuration config) {
@@ -42,48 +52,60 @@ public class ServiceNowAlertExtension {
     }
 
 
-    public int processAnEvent(String[] args) {
+    private boolean processAnEvent(String[] args) {
         Event event = eventBuilder.build(args);
         if (event != null) {
             HealthRuleViolationEvent violationEvent = (HealthRuleViolationEvent) event;
-
-            String summery = buildSummery(violationEvent);
-
-            Alert alert = new Alert();
-            alert.setAssignedTo(config.getAssignedTo());
-            alert.setAssignmentGroup(config.getAssignmentGroup());
-            alert.setCalledID(config.getCallerId());
-            alert.setCategory(config.getCategory());
-            alert.setImpact(getImpact(violationEvent));
-            alert.setLocation(config.getLocation());
-            alert.setPriority(violationEvent.getPriority());
-            alert.setShortDescription("Policy Violated - View more details inside");
-            alert.setWorkNotes(summery);
+            Alert alert = buildAlert(violationEvent);
             try {
                 HttpHandler handler = new HttpHandler(config);
                 String json = AlertBuilder.convertIntoJsonString(alert);
-                logger.debug("Json posted to ServiceNow ::" + json);
+                logger.debug("Json posting to ServiceNow ::" + json);
                 Response response = handler.postAlert(json);
                 int status = response.getStatus();
                 if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_CREATED) {
                     logger.info("Data successfully posted to ServiceNow");
-                    return 1;
+                    return true;
                 }
-                logger.error("Data post failed");
+                logger.error("Data post to ServiceNow failed with status " + status);
             } catch (JsonProcessingException e) {
-                logger.error("Cannot serialized object into Json." + e);
+                logger.error("Cannot serialized object into Json.", e);
             }
         }
-        return -1;
+        return false;
+    }
+
+    private Alert buildAlert(HealthRuleViolationEvent violationEvent) {
+
+        String summery = buildSummery(violationEvent);
+        String shortDescription = buildShortDescription(violationEvent);
+
+        Alert alert = new Alert();
+        alert.setAssignedTo(config.getAssignedTo());
+        alert.setAssignmentGroup(config.getAssignmentGroup());
+        alert.setCalledID(config.getCallerId());
+        alert.setCategory(config.getCategory());
+        alert.setImpact(getImpact(violationEvent));
+        alert.setLocation(config.getLocation());
+        alert.setPriority(violationEvent.getPriority());
+        alert.setShortDescription(shortDescription);
+        alert.setComments(summery);
+        return alert;
+    }
+
+    private String buildShortDescription(HealthRuleViolationEvent violationEvent) {
+        StringBuilder sb = new StringBuilder("Policy");
+        sb.append(SPACE).append(violationEvent.getHealthRuleName()).append(SPACE).append("for")
+                .append(SPACE).append(violationEvent.getAffectedEntityName()).append(SPACE).append("violated");
+        return sb.toString();
     }
 
     private String getImpact(HealthRuleViolationEvent violationEvent) {
-
         String severity = violationEvent.getSeverity();
         String severityInt = null;
-        if("ERROR".equals(severity)) {
+        if ("ERROR".equals(severity)) {
             severityInt = "1";
-        } else if("WARN".equals(severity)) {
+        } else if ("WARN".equals(severity)) {
             severityInt = "2";
         } else {
             severityInt = "3";
@@ -103,14 +125,14 @@ public class ServiceNowAlertExtension {
         List<EvaluationEntity> evaluationEntities = violationEvent.getEvaluationEntity();
         for (int i = 0; i < evaluationEntities.size(); i++) {
             EvaluationEntity evaluationEntity = evaluationEntities.get(i);
-            summery.append("EVALUATION ENTITY #").append(i+1).append(":").append(NEW_LINE);
+            summery.append("EVALUATION ENTITY #").append(i + 1).append(":").append(NEW_LINE);
             summery.append("Evaluation Entity:").append(evaluationEntity.getType()).append(NEW_LINE);
             summery.append("Evaluation Entity Name:").append(evaluationEntity.getName()).append(NEW_LINE);
 
             List<TriggerCondition> triggeredConditions = evaluationEntity.getTriggeredConditions();
             for (int j = 0; j < triggeredConditions.size(); j++) {
                 TriggerCondition triggerCondition = triggeredConditions.get(j);
-                summery.append("Triggered Condition #").append(j+1).append(":").append(NEW_LINE).append(NEW_LINE);
+                summery.append("Triggered Condition #").append(j + 1).append(":").append(NEW_LINE).append(NEW_LINE);
                 summery.append("Scope Type:").append(triggerCondition.getScopeType()).append(NEW_LINE);
                 summery.append("Scope Name:").append(triggerCondition.getScopeName()).append(NEW_LINE);
 
@@ -131,5 +153,4 @@ public class ServiceNowAlertExtension {
     private String getImplementationTitle() {
         return this.getClass().getPackage().getImplementationTitle();
     }
-
 }
