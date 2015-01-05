@@ -282,11 +282,11 @@ Please make sure to not use tab (\t) while editing yaml files. You may want to v
 
 	The following is an overview shot of ServiceNow:
 
-![]()
+![](https://raw.githubusercontent.com/Appdynamics/servicenow-api-alerting-extension/master/overview.png)
 
 The following shows the specifics of the ticket description:
 
-![]()
+![](https://raw.githubusercontent.com/Appdynamics/servicenow-api-alerting-extension/master/description.png)
 
 **Note**: Notice that the "assigned to" field has "ITIL User" current in place here. This is simply an example name taken from config.yaml.
 
