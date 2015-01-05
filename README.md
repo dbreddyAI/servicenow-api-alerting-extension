@@ -278,9 +278,8 @@ Please make sure to not use tab (\t) while editing yaml files. You may want to v
 
 ### Look for the newest created Incident in ServiceNow
 
-	When incident is created through AppDynamics it should look similar to the following screenshots.
-
-	The following is an overview shot of ServiceNow:
+When incident is created through AppDynamics it should look similar to the following screenshots.
+The following is an overview shot of ServiceNow:
 
 ![](https://raw.githubusercontent.com/Appdynamics/servicenow-api-alerting-extension/master/overview.png)
 
