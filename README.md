@@ -287,7 +287,7 @@ The following shows the specifics of the ticket description:
 
 ![](https://raw.githubusercontent.com/Appdynamics/servicenow-api-alerting-extension/master/description.png)
 
-**Note**: Notice that the "assigned to" field has "ITIL User" current in place here. This is simply an example name taken from config.yaml.
+**Note**: Notice that the "assigned to" field has "ITIL User" current in place here. This is taken from config.yaml.
 
 
 ###Limitation
