@@ -32,7 +32,7 @@ ServiceNow ([http://www.servicenow.com](www.servicenow.com)) is a software-as-a-
             <!-- For Linux/Unix *.sh -->
             <executable>servicenow-alert.sh</executable>
             <!-- For windows *.bat -->
-            <!--<executable>victorops-alert.bat</executable>-->
+            <!--<executable>servicenow-alert.bat</executable>-->
           </action>
       </custom-actions>
       ```
