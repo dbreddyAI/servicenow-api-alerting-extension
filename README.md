@@ -3,6 +3,8 @@
 ##Use Case
 ServiceNow ([http://www.servicenow.com](www.servicenow.com)) is a software-as-a-service (SaaS) provider of IT service management (ITSM) software. AppDynamics integrates directly with ServiceNow to create tickets in response to alerts. With the ServiceNow integration you can leverage your existing ticketing infrastructure to notify your operations team to resolve performance degradation issues.
 
+**Note: This extension works only with AppDynamics Health Rule Violation events.
+
 ##Installation Steps
 
  1. Run "mvn clean install"
@@ -74,7 +76,7 @@ Please make sure to not use tab (\t) while editing yaml files. You may want to v
     location: "Alabama"
 ```
 
-### Below is how the AppDynamics event's parameters are associated with ServiceNoe parameters:
+### Below is how the AppDynamics event's parameters are associated with ServiceNow parameters:
 
 <table>
 	<tr>
