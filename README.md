@@ -3,7 +3,7 @@
 ##Use Case
 ServiceNow ([http://www.servicenow.com](www.servicenow.com)) is a software-as-a-service (SaaS) provider of IT service management (ITSM) software. AppDynamics integrates directly with ServiceNow to create tickets in response to alerts. With the ServiceNow integration you can leverage your existing ticketing infrastructure to notify your operations team to resolve performance degradation issues.
 
-**Note: This extension works only with AppDynamics Health Rule Violation events.
+**Note**: This extension works only with AppDynamics Health Rule Violation events.
 
 ##Installation Steps
 
