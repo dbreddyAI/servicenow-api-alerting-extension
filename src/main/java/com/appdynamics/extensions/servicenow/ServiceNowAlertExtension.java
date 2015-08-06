@@ -6,7 +6,6 @@ import com.appdynamics.extensions.alerts.customevents.Event;
 import com.appdynamics.extensions.alerts.customevents.EventBuilder;
 import com.appdynamics.extensions.alerts.customevents.HealthRuleViolationEvent;
 import com.appdynamics.extensions.alerts.customevents.TriggerCondition;
-import com.appdynamics.extensions.http.Response;
 import com.appdynamics.extensions.servicenow.api.Alert;
 import com.appdynamics.extensions.servicenow.api.AlertBuilder;
 import com.appdynamics.extensions.servicenow.common.Configuration;
@@ -16,7 +15,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.net.HttpURLConnection;
 import java.util.List;
 
 public class ServiceNowAlertExtension {
@@ -62,13 +60,7 @@ public class ServiceNowAlertExtension {
                     HttpHandler handler = new HttpHandler(config);
                     String json = AlertBuilder.convertIntoJsonString(alert);
                     logger.debug("Json posting to ServiceNow ::" + json);
-                    Response response = handler.postAlert(json);
-                    int status = response.getStatus();
-                    if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_CREATED) {
-                        logger.info("Data successfully posted to ServiceNow");
-                        return true;
-                    }
-                    logger.error("Data post to ServiceNow failed with status " + status+" Message ["+response.string()+"]");
+                    return handler.postAlert(json);
                 } catch (JsonProcessingException e) {
                     logger.error("Cannot serialized object into Json.", e);
                 }

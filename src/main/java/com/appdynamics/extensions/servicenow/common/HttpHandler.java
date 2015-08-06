@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,20 +30,33 @@ public class HttpHandler {
      * @param data
      * @return
      */
-    public Response postAlert(String data) {
+    public boolean postAlert(String data) {
         Map<String, String> httpConfigMap = createHttpConfigMap();
         logger.debug("Building the httpClient");
-        SimpleHttpClient simpleHttpClient = SimpleHttpClient.builder(httpConfigMap)
-                .build();
-        String targetUrl = buildTargetUrl();
-        logger.debug("Posting data to ServiceNow at " + targetUrl);
+        SimpleHttpClient simpleHttpClient = null;
 
-        Response response = simpleHttpClient.target(targetUrl)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                .post(data);
-        logger.debug("HTTP Response status from ServiceNow " + response.getStatus());
-        return response;
+        try {
+            simpleHttpClient = SimpleHttpClient.builder(httpConfigMap)
+                    .build();
+            String targetUrl = buildTargetUrl();
+            logger.debug("Posting data to ServiceNow at " + targetUrl);
+
+            Response response = simpleHttpClient.target(targetUrl)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                    .post(data);
+            int status = response.getStatus();
+            if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_CREATED) {
+                logger.info("Data successfully posted to ServiceNow");
+                return true;
+            }
+            logger.error("Data post to ServiceNow failed with status " + status + " and error message[" + response.string() + "]");
+        } finally {
+            if(simpleHttpClient != null) {
+                simpleHttpClient.close();
+            }
+        }
+        return false;
     }
 
 
