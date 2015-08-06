@@ -55,21 +55,25 @@ public class ServiceNowAlertExtension {
     private boolean processAnEvent(String[] args) {
         Event event = eventBuilder.build(args);
         if (event != null) {
-            HealthRuleViolationEvent violationEvent = (HealthRuleViolationEvent) event;
-            Alert alert = buildAlert(violationEvent);
-            try {
-                HttpHandler handler = new HttpHandler(config);
-                String json = AlertBuilder.convertIntoJsonString(alert);
-                logger.debug("Json posting to ServiceNow ::" + json);
-                Response response = handler.postAlert(json);
-                int status = response.getStatus();
-                if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_CREATED) {
-                    logger.info("Data successfully posted to ServiceNow");
-                    return true;
+            if (event instanceof HealthRuleViolationEvent) {
+                HealthRuleViolationEvent violationEvent = (HealthRuleViolationEvent) event;
+                Alert alert = buildAlert(violationEvent);
+                try {
+                    HttpHandler handler = new HttpHandler(config);
+                    String json = AlertBuilder.convertIntoJsonString(alert);
+                    logger.debug("Json posting to ServiceNow ::" + json);
+                    Response response = handler.postAlert(json);
+                    int status = response.getStatus();
+                    if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_CREATED) {
+                        logger.info("Data successfully posted to ServiceNow");
+                        return true;
+                    }
+                    logger.error("Data post to ServiceNow failed with status " + status+" Message ["+response.string()+"]");
+                } catch (JsonProcessingException e) {
+                    logger.error("Cannot serialized object into Json.", e);
                 }
-                logger.error("Data post to ServiceNow failed with status " + status);
-            } catch (JsonProcessingException e) {
-                logger.error("Cannot serialized object into Json.", e);
+            } else {
+                logger.error("This extension only works with Health Rule Violation Event. Skipping this event as this is not Health Rule Violation Event");
             }
         }
         return false;
@@ -85,8 +89,8 @@ public class ServiceNowAlertExtension {
         alert.setAssignmentGroup(config.getAssignmentGroup());
         alert.setCalledID(config.getCallerId());
         alert.setCategory(config.getCategory());
-        alert.setImpact(getImpact(violationEvent));
         alert.setLocation(config.getLocation());
+        alert.setImpact(getImpact(violationEvent));
         alert.setPriority(violationEvent.getPriority());
         alert.setShortDescription(shortDescription);
         alert.setComments(summery);

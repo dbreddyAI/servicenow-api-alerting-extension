@@ -1,5 +1,5 @@
 #ServiceNow Domain
-domain: "https://dev119.service-now.com"
+domain: "https://dev113.service-now.com"
 
 #ServiceNow User
 username: "admin"
@@ -8,7 +8,7 @@ username: "admin"
 password: "changeme"
 
 #ServiceNow Version
-serviceNowVersion: "Dublin"
+serviceNowVersion: "Eureka"
 
 #Proxy server host
 proxyHost: ""
@@ -23,5 +23,5 @@ proxyPassword: ""
 assignmentGroup: ""
 assignedTo: ""
 callerId: ""
-category: ""
-location: ""
+#category: ""
+#location: ""
