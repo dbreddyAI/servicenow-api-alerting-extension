@@ -5,6 +5,10 @@ ServiceNow ([http://www.servicenow.com](www.servicenow.com)) is a software-as-a-
 
 **Note**: This extension works only with AppDynamics Health Rule Violation events.
 
+##Prerequisites
+
+To post events to ServiceNow user should have "rest_service" role.
+
 ##Installation Steps
 
  1. Run "mvn clean install"
