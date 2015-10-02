@@ -1,23 +1,26 @@
 #ServiceNow Domain
-domain: "https://dev113.service-now.com"
+domain: "https://sandbox.service-now.com"
 
 #ServiceNow User
 username: "admin"
 
-#ServiceNow Password
-password: "changeme"
+#ServiceNow Password, provide password or passwordEncrypted and encryptionKey.
+password:
+
+passwordEncrypted: "0LKLGb4hc3pAczHmzxQ5ig=="
+encryptionKey: "welcome123"
 
 #ServiceNow Version
-serviceNowVersion: "Eureka"
+serviceNowVersion: "Fuji"
 
 #Proxy server host
-proxyHost: ""
+proxyHost:
 #Proxy server port
-proxyPort: ""
+proxyPort:
 #Proxy server user name
-proxyUser: ""
+proxyUser:
 #Proxy server password
-proxyPassword: ""
+proxyPassword:
 
 #ServiceNow User Specific
 assignmentGroup: ""

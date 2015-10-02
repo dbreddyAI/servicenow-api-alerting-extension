@@ -63,7 +63,19 @@ public class HttpHandler {
     private Map<String, String> createHttpConfigMap() {
         Map<String, String> map = new HashMap<String, String>();
         map.put(TaskInputArgs.USER, config.getUsername());
-        map.put(TaskInputArgs.PASSWORD, config.getPassword());
+        String password = config.getPassword();
+
+        if(password != null) {
+            logger.debug("Using provided password");
+            map.put(TaskInputArgs.PASSWORD, password);
+        }
+
+        String passwordEncrypted = config.getPasswordEncrypted();
+        if(passwordEncrypted != null) {
+            logger.debug("Using provided passwordEncrypted");
+            map.put(TaskInputArgs.PASSWORD_ENCRYPTED, passwordEncrypted);
+            map.put(TaskInputArgs.ENCRYPTION_KEY, config.getEncryptionKey());
+        }
 
         map.put(TaskInputArgs.PROXY_HOST, config.getProxyHost());
         map.put(TaskInputArgs.PROXY_PORT, config.getProxyPort());
