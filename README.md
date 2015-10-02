@@ -52,33 +52,52 @@ Please make sure to not use tab (\t) while editing yaml files. You may want to v
 
 ```
 	#ServiceNow Domain
-    domain: ""
-
-    #ServiceNow User
-    username: ""
-
-    #ServiceNow Password
-    password: ""
-
-    #ServiceNow Version
-    serviceNowVersion: "Dublin"
-
-    #Proxy server host
-    proxyHost: ""
-    #Proxy server port
-    proxyPort: ""
-    #Proxy server user name
-    proxyUser: ""
-    #Proxy server password
-    proxyPassword: ""
-
-    #ServiceNow User Specific
-    assignmentGroup: "Network"
-    assignedTo: "itil@example.com"
-    callerId: "abel.tuter@example.com"
-    category: "network"
-    location: "Alabama"
+	domain: "https://sandbox.service-now.com"
+	
+	#ServiceNow User
+	username: "admin"
+	
+	#ServiceNow Password, provide password or passwordEncrypted and encryptionKey.
+	password:
+	
+	passwordEncrypted: "0LKLGb4hc3pAczHmzxQ5ig=="
+	encryptionKey: "welcome123"
+	
+	#ServiceNow Version
+	serviceNowVersion: "Fuji"
+	
+	#Proxy server host
+	proxyHost:
+	#Proxy server port
+	proxyPort:
+	#Proxy server user name
+	proxyUser:
+	#Proxy server password
+	proxyPassword:
+	
+	#ServiceNow User Specific
+	assignmentGroup: "Network"
+	assignedTo: "itil@example.com"
+	callerId: "abel.tuter@example.com"
+	category: "network"
+	location: "Alabama"
 ```
+
+###Password Encryption
+To set passwordEncrypted in config.yaml, follow the steps below:
+
+1. Download the util jar to encrypt the password from [here](https://github.com/Appdynamics/maven-repo/blob/master/releases/com/appdynamics/appd-exts-commons/1.1.2/appd-exts-commons-1.1.2.jar).
+2. Run command:
+
+   	~~~   
+   	java -cp appd-exts-commons-1.1.2.jar com.appdynamics.extensions.crypto.Encryptor EncryptionKey CredentialToEncrypt
+   	
+   	For example: 
+   	java -cp "appd-exts-commons-1.1.2.jar" com.appdynamics.extensions.crypto.Encryptor test password
+   
+   	~~~
+   	
+3. Set the resulting encrypted password in passwordEncrypted field and the encryption key used in encryptionKey field in config.yaml file
 
 ### Below is how the AppDynamics event's parameters are associated with ServiceNow parameters:
 
