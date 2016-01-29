@@ -1,17 +1,17 @@
 #ServiceNow Domain
-domain: "https://sandbox.service-now.com"
+domain: "https://dev119.service-now.com"
 
 #ServiceNow User
 username: "admin"
 
 #ServiceNow Password, provide password or passwordEncrypted and encryptionKey.
-password:
+password: "L527mKTYPFBG1"
 
-passwordEncrypted: "0LKLGb4hc3pAczHmzxQ5ig=="
-encryptionKey: "welcome123"
+passwordEncrypted:
+encryptionKey:
 
 #ServiceNow Version
-serviceNowVersion: "Fuji"
+serviceNowVersion: "Dublin"
 
 #Proxy server host
 proxyHost:

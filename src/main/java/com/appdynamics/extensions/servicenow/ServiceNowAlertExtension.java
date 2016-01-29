@@ -7,11 +7,9 @@ import com.appdynamics.extensions.alerts.customevents.EventBuilder;
 import com.appdynamics.extensions.alerts.customevents.HealthRuleViolationEvent;
 import com.appdynamics.extensions.alerts.customevents.TriggerCondition;
 import com.appdynamics.extensions.servicenow.api.Alert;
-import com.appdynamics.extensions.servicenow.api.AlertBuilder;
 import com.appdynamics.extensions.servicenow.common.Configuration;
 import com.appdynamics.extensions.servicenow.common.HttpHandler;
 import com.appdynamics.extensions.yml.YmlReader;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -28,6 +26,7 @@ public class ServiceNowAlertExtension {
     final EventBuilder eventBuilder = new EventBuilder();
 
     public static void main(String[] args) {
+
         try {
             Configuration config = YmlReader.readFromFile(CONFIG_FILENAME, Configuration.class);
             ServiceNowAlertExtension serviceNowAlert = new ServiceNowAlertExtension(config);
@@ -56,14 +55,9 @@ public class ServiceNowAlertExtension {
             if (event instanceof HealthRuleViolationEvent) {
                 HealthRuleViolationEvent violationEvent = (HealthRuleViolationEvent) event;
                 Alert alert = buildAlert(violationEvent);
-                try {
-                    HttpHandler handler = new HttpHandler(config);
-                    String json = AlertBuilder.convertIntoJsonString(alert);
-                    logger.debug("Json posting to ServiceNow ::" + json);
-                    return handler.postAlert(json);
-                } catch (JsonProcessingException e) {
-                    logger.error("Cannot serialized object into Json.", e);
-                }
+
+                HttpHandler handler = new HttpHandler(config);
+                return handler.postAlert(alert);
             } else {
                 logger.error("This extension only works with Health Rule Violation Event. Skipping this event as this is not Health Rule Violation Event");
             }
