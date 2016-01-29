@@ -326,7 +326,7 @@ Always feel free to fork and contribute any changes directly via [GitHub](https:
 
 ##Community
 
-Find out more in the [AppSphere](http://community.appdynamics.com/t5/eXchange-Community-AppDynamics/AppDynamics-ServiceNow-REST-API-Alerting-Extension/idi-p/13798) community.
+Find out more in the [AppSphere](https://www.appdynamics.com/community/exchange/extension/appdynamics-servicenow-rest-api-alerting-extension/) community.
 
 ##Support
 
