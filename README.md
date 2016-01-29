@@ -319,6 +319,7 @@ The following shows the specifics of the ticket description:
 
 Comments are only shown in REST API supported versions (Eureka, Fuji). In older versions (Calgary, Dublin) comments are not visible.
 
+From version 1.3, we have added support to display comments in the Calagry and Dublin version too. To achieve this, after creating the incident we are inserting a comments field in sys_journal_field for the created incident.
 
 ##Contributing
 
