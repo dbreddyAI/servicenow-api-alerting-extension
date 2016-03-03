@@ -67,7 +67,7 @@ public class ServiceNowAlertExtension {
 
     private Alert buildAlert(HealthRuleViolationEvent violationEvent) {
 
-        String summery = buildSummery(violationEvent);
+        String comments = buildSummery(violationEvent);
         String shortDescription = buildShortDescription(violationEvent);
 
         Alert alert = new Alert();
@@ -79,7 +79,7 @@ public class ServiceNowAlertExtension {
         alert.setImpact(getImpact(violationEvent));
         alert.setPriority(violationEvent.getPriority());
         alert.setShortDescription(shortDescription);
-        alert.setComments(summery);
+        alert.setComments(comments);
         return alert;
     }
 
