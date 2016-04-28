@@ -1,21 +1,13 @@
 package com.appdynamics.extensions.servicenow.api;
 
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Alert {
-
-    @JsonProperty("assignment_group")
-    private String assignmentGroup;
-
-    @JsonProperty("assigned_to")
-    private String assignedTo;
-
-    @JsonProperty("caller_id")
-    private String calledID;
-
-    @JsonProperty("category")
-    private String category;
 
     @JsonProperty("short_description")
     private String shortDescription;
@@ -23,46 +15,14 @@ public class Alert {
     @JsonProperty("comments")
     private String comments;
 
-    @JsonProperty("location")
-    private String location;
-
     @JsonProperty("impact")
     private String impact;
 
     @JsonProperty("priority")
     private String priority;
 
-    public String getAssignmentGroup() {
-        return assignmentGroup;
-    }
+    private Map<String, String> dynamicProperties = new HashMap<String, String>();
 
-    public void setAssignmentGroup(String assignmentGroup) {
-        this.assignmentGroup = assignmentGroup;
-    }
-
-    public String getAssignedTo() {
-        return assignedTo;
-    }
-
-    public void setAssignedTo(String assignedTo) {
-        this.assignedTo = assignedTo;
-    }
-
-    public String getCalledID() {
-        return calledID;
-    }
-
-    public void setCalledID(String calledID) {
-        this.calledID = calledID;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
 
     public String getShortDescription() {
         return shortDescription;
@@ -80,14 +40,6 @@ public class Alert {
         this.comments = comments;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public String getImpact() {
         return impact;
     }
@@ -102,5 +54,24 @@ public class Alert {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    @JsonAnyGetter
+    public Map<String, String> getDynamicProperties() {
+        return dynamicProperties;
+    }
+
+    public void setDynamicProperties(Map<String, String> dynamicProperties) {
+        this.dynamicProperties = dynamicProperties;
+    }
+
+    public void addDynamicProperties(String name, String value) {
+        if (dynamicProperties == null) {
+            dynamicProperties = new HashMap<String, String>();
+        }
+
+        if (value != null && value.length() > 0) {
+            dynamicProperties.put(name, value);
+        }
     }
 }

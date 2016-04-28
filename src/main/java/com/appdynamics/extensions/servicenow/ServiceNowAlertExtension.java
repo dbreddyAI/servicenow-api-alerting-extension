@@ -8,11 +8,13 @@ import com.appdynamics.extensions.alerts.customevents.HealthRuleViolationEvent;
 import com.appdynamics.extensions.alerts.customevents.TriggerCondition;
 import com.appdynamics.extensions.servicenow.api.Alert;
 import com.appdynamics.extensions.servicenow.common.Configuration;
+import com.appdynamics.extensions.servicenow.common.Field;
 import com.appdynamics.extensions.servicenow.common.HttpHandler;
 import com.appdynamics.extensions.yml.YmlReader;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 public class ServiceNowAlertExtension {
@@ -28,6 +30,11 @@ public class ServiceNowAlertExtension {
     public static void main(String[] args) {
 
         try {
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Args passed are " + Arrays.toString(args));
+            }
+
             Configuration config = YmlReader.readFromFile(CONFIG_FILENAME, Configuration.class);
             ServiceNowAlertExtension serviceNowAlert = new ServiceNowAlertExtension(config);
             boolean status = serviceNowAlert.processAnEvent(args);
@@ -71,15 +78,21 @@ public class ServiceNowAlertExtension {
         String shortDescription = buildShortDescription(violationEvent);
 
         Alert alert = new Alert();
-        alert.setAssignedTo(config.getAssignedTo());
-        alert.setAssignmentGroup(config.getAssignmentGroup());
-        alert.setCalledID(config.getCallerId());
-        alert.setCategory(config.getCategory());
-        alert.setLocation(config.getLocation());
         alert.setImpact(getImpact(violationEvent));
         alert.setPriority(violationEvent.getPriority());
         alert.setShortDescription(shortDescription);
         alert.setComments(comments);
+
+        List<Field> fields = config.getFields();
+
+        if (fields != null) {
+            for (Field field : fields) {
+                if (field.getValue() != null && field.getValue().length() > 0) {
+                    alert.addDynamicProperties(field.getName(), field.getValue());
+                }
+            }
+        }
+
         return alert;
     }
 

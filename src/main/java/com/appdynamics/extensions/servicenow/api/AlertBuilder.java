@@ -15,6 +15,7 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 public class AlertBuilder {
 
@@ -53,15 +54,19 @@ public class AlertBuilder {
             SOAPElement insertElement = soapBody.addChildElement("insert", "", "http://www.service-now.com");
 
 
-            addRequest("assignment_group", alert.getAssignmentGroup(), insertElement);
-            addRequest("assigned_to", alert.getAssignedTo(), insertElement);
-            addRequest("caller_id", alert.getCalledID(), insertElement);
-            addRequest("category", alert.getCategory(), insertElement);
             addRequest("short_description", alert.getShortDescription(), insertElement);
             addRequest("comments", alert.getComments(), insertElement);
-            addRequest("location", alert.getLocation(), insertElement);
             addRequest("impact", alert.getImpact(), insertElement);
             addRequest("priority", alert.getPriority(), insertElement);
+
+            Map<String, String> dynamicProperties = alert.getDynamicProperties();
+            if (dynamicProperties != null) {
+                for (Map.Entry<String, String> field : dynamicProperties.entrySet()) {
+                    if (field.getValue() != null && field.getValue().length() > 0) {
+                        addRequest(field.getKey(), field.getValue(), insertElement);
+                    }
+                }
+            }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             soapMessage.writeTo(out);

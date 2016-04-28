@@ -1,6 +1,9 @@
 package com.appdynamics.extensions.servicenow.common;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Configuration {
 
     private String domain;
@@ -14,11 +17,7 @@ public class Configuration {
     private String proxyUser;
     private String proxyPassword;
 
-    private String assignmentGroup;
-    private String assignedTo;
-    private String callerId;
-    private String category;
-    private String location;
+    private List<Field> fields = new ArrayList<Field>();
 
 
     public String getDomain() {
@@ -102,43 +101,11 @@ public class Configuration {
         this.proxyPassword = proxyPassword;
     }
 
-    public String getAssignmentGroup() {
-        return assignmentGroup;
+    public List<Field> getFields() {
+        return fields;
     }
 
-    public void setAssignmentGroup(String assignmentGroup) {
-        this.assignmentGroup = assignmentGroup;
-    }
-
-    public String getAssignedTo() {
-        return assignedTo;
-    }
-
-    public void setAssignedTo(String assignedTo) {
-        this.assignedTo = assignedTo;
-    }
-
-    public String getCallerId() {
-        return callerId;
-    }
-
-    public void setCallerId(String callerId) {
-        this.callerId = callerId;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+    public void setFields(List<Field> fields) {
+        this.fields = fields;
     }
 }
