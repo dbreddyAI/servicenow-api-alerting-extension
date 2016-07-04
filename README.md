@@ -66,21 +66,30 @@ Please make sure to not use tab (\t) while editing yaml files. You may want to v
 	#ServiceNow Version
 	serviceNowVersion: "Fuji"
 	
-	#Proxy server host
-	proxyHost:
-	#Proxy server port
-	proxyPort:
+	#Proxy server URI
+	proxyUri:
 	#Proxy server user name
 	proxyUser:
 	#Proxy server password
 	proxyPassword:
 	
 	#ServiceNow User Specific
-	assignmentGroup: "Network"
-	assignedTo: "itil@example.com"
-	callerId: "abel.tuter@example.com"
-	category: "network"
-	location: "Alabama"
+	#Please define your ServiceNow specific fields here like assignment_group, assigned_to, caller_id, category and location.
+	#The name should be a valid Incident table's column name.
+	#Do not add properties short_description, comments, impact and priority here, as they are added by the extenson automatically
+	fields:
+	   - name: "assignment_group"
+	     value: "Capacity Mgmt"
+	   - name: "assigned_to"
+	     value: "Don Goodliffe"
+	   - name: "caller_id"
+	     value: "abel.tuter@example.com"
+	   - name: "category"
+	     value: "request"
+	   - name: "location"
+	     value: "Denver"
+	   - name: "contact_type"
+	     value: "email"
 ```
 
 ###Password Encryption
