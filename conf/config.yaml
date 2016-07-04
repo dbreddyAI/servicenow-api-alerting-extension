@@ -11,12 +11,10 @@ passwordEncrypted:
 encryptionKey:
 
 #ServiceNow Version
-serviceNowVersion: "Eureka"
+serviceNowVersion: "Fuji"
 
-#Proxy server host
-proxyHost:
-#Proxy server port
-proxyPort:
+#Proxy server URI
+proxyUri:
 #Proxy server user name
 proxyUser:
 #Proxy server password

@@ -12,8 +12,7 @@ public class Configuration {
     private String passwordEncrypted;
     private String encryptionKey;
     private String serviceNowVersion;
-    private String proxyHost;
-    private String proxyPort;
+    private String proxyUri;
     private String proxyUser;
     private String proxyPassword;
 
@@ -69,20 +68,12 @@ public class Configuration {
         this.serviceNowVersion = serviceNowVersion;
     }
 
-    public String getProxyHost() {
-        return proxyHost;
+    public String getProxyUri() {
+        return proxyUri;
     }
 
-    public void setProxyHost(String proxyHost) {
-        this.proxyHost = proxyHost;
-    }
-
-    public String getProxyPort() {
-        return proxyPort;
-    }
-
-    public void setProxyPort(String proxyPort) {
-        this.proxyPort = proxyPort;
+    public void setProxyUri(String proxyUri) {
+        this.proxyUri = proxyUri;
     }
 
     public String getProxyUser() {
