@@ -21,6 +21,16 @@ public class Alert {
     @JsonProperty("priority")
     private String priority;
 
+    @JsonProperty("state")
+    private String state;
+
+    @JsonProperty("close_code")
+    private String closeCode;
+
+    @JsonProperty("close_notes")
+    private String closeNotes;
+
+
     private Map<String, String> dynamicProperties = new HashMap<String, String>();
 
 
@@ -54,6 +64,30 @@ public class Alert {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCloseCode() {
+        return closeCode;
+    }
+
+    public void setCloseCode(String closeCode) {
+        this.closeCode = closeCode;
+    }
+
+    public String getCloseNotes() {
+        return closeNotes;
+    }
+
+    public void setCloseNotes(String closeNotes) {
+        this.closeNotes = closeNotes;
     }
 
     @JsonAnyGetter

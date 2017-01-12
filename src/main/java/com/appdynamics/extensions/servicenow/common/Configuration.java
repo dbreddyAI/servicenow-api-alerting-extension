@@ -16,6 +16,8 @@ public class Configuration {
     private String proxyUser;
     private String proxyPassword;
 
+    private String closeNotesText;
+
     private List<Field> fields = new ArrayList<Field>();
 
 
@@ -98,5 +100,13 @@ public class Configuration {
 
     public void setFields(List<Field> fields) {
         this.fields = fields;
+    }
+
+    public String getCloseNotesText() {
+        return closeNotesText;
+    }
+
+    public void setCloseNotesText(String closeNotesText) {
+        this.closeNotesText = closeNotesText;
     }
 }

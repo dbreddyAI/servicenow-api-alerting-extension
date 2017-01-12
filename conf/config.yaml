@@ -2,7 +2,7 @@
 domain: ""
 
 #ServiceNow User
-username: ""
+username: "admin"
 
 #ServiceNow Password, provide password or passwordEncrypted and encryptionKey.
 password: ""
@@ -13,6 +13,9 @@ encryptionKey:
 #ServiceNow Version
 serviceNowVersion: "Fuji"
 
+#Close notes text to be posted when resolving the incident
+closeNotesText: "This incident is resolved"
+
 #Proxy server URI
 proxyUri:
 #Proxy server user name
@@ -20,20 +23,17 @@ proxyUser:
 #Proxy server password
 proxyPassword:
 
+
 #ServiceNow User Specific
 #Please define your ServiceNow specific fields here like assignment_group, assigned_to, caller_id, category and location.
 #The name should be a valid Incident table's column name.
-#Do not add properties short_description, comments, impact and priority here, as they are added by the extenson automatically
+#Do not add properties short_description, comments, impact and priority here, as they are added by the extension automatically
 fields:
-   - name: "assignment_group"
-     value: "Capacity Mgmt"
    - name: "assigned_to"
-     value: "Don Goodliffe"
-   - name: "caller_id"
-     value: "abel.tuter@example.com"
+     value: "ITPAM_Autobot"
    - name: "category"
-     value: "request"
+     value: "Inquiry / Help"
+   - name: "subcategory"
+     value: "Application Services"
    - name: "location"
      value: "Denver"
-   - name: "contact_type"
-     value: "email"

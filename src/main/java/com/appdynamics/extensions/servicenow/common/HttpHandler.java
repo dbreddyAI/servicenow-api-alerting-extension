@@ -6,12 +6,14 @@ import com.appdynamics.extensions.http.Http4ClientBuilder;
 import com.appdynamics.extensions.servicenow.api.Alert;
 import com.appdynamics.extensions.servicenow.api.AlertBuilder;
 import com.appdynamics.extensions.servicenow.api.DataParsingException;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.apache.http.auth.AuthSchemeProvider;
+import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -21,7 +23,7 @@ import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.auth.BasicSchemeFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -51,7 +53,6 @@ public class HttpHandler {
     public static final String FORWARD_SLASH = "/";
 
     private CloseableHttpClient httpClient;
-    private HttpClientContext httpContext;
 
     private final Configuration config;
     private static Logger logger = Logger.getLogger(HttpHandler.class);
@@ -65,9 +66,9 @@ public class HttpHandler {
      * Posts the data to ServiceNow.
      *
      * @param alert
-     * @return
+     * @param incidentID
      */
-    public boolean postAlert(Alert alert) {
+    public boolean postAlert(Alert alert, String incidentID) {
 
         String payload;
         try {
@@ -94,7 +95,7 @@ public class HttpHandler {
 
             post.setEntity(new StringEntity(payload));
 
-            CloseableHttpResponse response = httpClient.execute(post, httpContext);
+            CloseableHttpResponse response = httpClient.execute(post);
 
             int status = response.getStatusLine().getStatusCode();
             String responseString = EntityUtils.toString(response.getEntity());
@@ -102,6 +103,25 @@ public class HttpHandler {
             if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_CREATED) {
                 logger.info("Data successfully posted to ServiceNow ");
                 logger.debug("ServiceNow response " + responseString);
+
+                String sys_id = null;
+                if (!isOlderVersion()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(responseString);
+                    JsonNode result = root.path("result");
+                    sys_id = result.path("sys_id").asText();
+                } else {
+
+                    XmlMapper xmlMapper = new XmlMapper();
+                    JsonNode root = xmlMapper.readTree(responseString);
+                    JsonNode insertResponse = root.path("Body").path("insertResponse");
+                    sys_id = insertResponse.path("sys_id").asText();
+
+                }
+
+                FileSystemStore.INSTANCE.putInStore(incidentID, sys_id);
+
+
                 return true;
             }
             logger.error("Data post to ServiceNow failed with status " + status + " and error message[" + responseString + "]");
@@ -155,23 +175,16 @@ public class HttpHandler {
         HttpClientBuilder builder = Http4ClientBuilder.getBuilder(map);
         builder.setConnectionManager(connMgr);
 
+        builder.setSSLSocketFactory(sslSocketFactory);
 
-        httpContext = HttpClientContext.create();
+        //Keeping only Basic auth
+        Registry<AuthSchemeProvider> r = RegistryBuilder.<AuthSchemeProvider>create()
+                .register(AuthSchemes.BASIC, new BasicSchemeFactory())
+                .build();
 
-        HttpClientBuilder httpClientBuilder = builder.setSSLSocketFactory(sslSocketFactory);
+        builder.setDefaultAuthSchemeRegistry(r);
 
-        if (config.getUsername() != null && config.getUsername().length() > 0) {
-
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY,
-                    new UsernamePasswordCredentials(config.getUsername(), getPassword()));
-
-            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-
-            httpContext.setCredentialsProvider(credentialsProvider);
-        }
-
-        httpClient = httpClientBuilder.build();
+        httpClient = builder.build();
     }
 
     private Map<String, String> createHttpConfigMap() {
@@ -236,5 +249,85 @@ public class HttpHandler {
     private boolean isOlderVersion() {
         String serviceNowVersion = config.getServiceNowVersion();
         return "Calgary".equalsIgnoreCase(serviceNowVersion) || "Dublin".equalsIgnoreCase(serviceNowVersion);
+    }
+
+    public boolean updateAlert(Alert alert, String incidentID, String snowSysId, boolean closeEvent) {
+
+        String payload;
+        try {
+            payload = AlertBuilder.convertIntoUpdateString(alert, config, snowSysId, closeEvent);
+            logger.debug("String posting to ServiceNow ::" + payload);
+        } catch (DataParsingException e) {
+            logger.error("Cannot parse object", e);
+            return false;
+        }
+
+
+        try {
+            String targetUrl = buildTargetUrlForUpdate(snowSysId);
+            logger.debug("Posting data to ServiceNow at " + targetUrl);
+
+
+            CloseableHttpResponse response = null;
+            if (isOlderVersion()) {
+                HttpPost post = new HttpPost(targetUrl);
+                post.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_XML);
+                post.addHeader(HttpHeaders.ACCEPT, MediaType.TEXT_XML);
+
+                post.setEntity(new StringEntity(payload));
+
+                response = httpClient.execute(post);
+
+            } else {
+                HttpPut put = new HttpPut(targetUrl);
+                put.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+                put.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
+
+                put.setEntity(new StringEntity(payload));
+
+                response = httpClient.execute(put);
+            }
+
+            int status = response.getStatusLine().getStatusCode();
+            String responseString = EntityUtils.toString(response.getEntity());
+
+            if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_CREATED) {
+                logger.info("Data successfully posted to ServiceNow ");
+                logger.debug("ServiceNow response " + responseString);
+
+                if (closeEvent) {
+                    FileSystemStore.INSTANCE.removeFromStore(incidentID);
+                }
+
+                return true;
+            }
+            logger.error("Data post to ServiceNow failed with status " + status + " and error message[" + responseString + "]");
+        } catch (IOException e) {
+            logger.error("Error while posting data to ServiceNow", e);
+        } finally {
+            if (httpClient != null) {
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    logger.error("Error while closing the HttpClient", e);
+                }
+            }
+        }
+        return false;
+    }
+
+    private String buildTargetUrlForUpdate(String snowSysId) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(config.getDomain());
+
+
+        if (isOlderVersion()) {
+            sb.append(FORWARD_SLASH).append(SOAP_URI);
+        } else {
+            sb.append(FORWARD_SLASH).append(REST_URL).append("/").append(snowSysId);
+        }
+        return sb.toString();
     }
 }

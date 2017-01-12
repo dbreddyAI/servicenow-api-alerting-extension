@@ -9,8 +9,10 @@ import com.appdynamics.extensions.alerts.customevents.TriggerCondition;
 import com.appdynamics.extensions.servicenow.api.Alert;
 import com.appdynamics.extensions.servicenow.common.Configuration;
 import com.appdynamics.extensions.servicenow.common.Field;
+import com.appdynamics.extensions.servicenow.common.FileSystemStore;
 import com.appdynamics.extensions.servicenow.common.HttpHandler;
 import com.appdynamics.extensions.yml.YmlReader;
+import com.google.common.base.Strings;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -24,6 +26,9 @@ public class ServiceNowAlertExtension {
     private Configuration config;
     private static final String NEW_LINE = "\n";
     private static final String SPACE = " ";
+
+    public static final String POLICY_CLOSE = "POLICY_CLOSE";
+    public static final String POLICY_CANCELED = "POLICY_CANCELED";
 
     final EventBuilder eventBuilder = new EventBuilder();
 
@@ -63,8 +68,18 @@ public class ServiceNowAlertExtension {
                 HealthRuleViolationEvent violationEvent = (HealthRuleViolationEvent) event;
                 Alert alert = buildAlert(violationEvent);
 
+                String incidentID = violationEvent.getIncidentID();
+                String snowSysId = FileSystemStore.INSTANCE.getFromStore(incidentID);
+
                 HttpHandler handler = new HttpHandler(config);
-                return handler.postAlert(alert);
+
+                if (Strings.isNullOrEmpty(snowSysId)) {
+                    return handler.postAlert(alert, incidentID);
+                } else {
+                    String eventType = violationEvent.getEventType();
+                    boolean closeEvent = shouldResolveEvent(eventType);
+                    return handler.updateAlert(alert, incidentID, snowSysId, closeEvent);
+                }
             } else {
                 logger.error("This extension only works with Health Rule Violation Event. Skipping this event as this is not Health Rule Violation Event");
             }
@@ -151,6 +166,10 @@ public class ServiceNowAlertExtension {
             }
         }
         return summery.toString();
+    }
+
+    private boolean shouldResolveEvent(String eventType) {
+        return eventType != null && (eventType.startsWith(POLICY_CLOSE) || eventType.startsWith(POLICY_CANCELED));
     }
 
     private String getImplementationTitle() {
