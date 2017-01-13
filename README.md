@@ -65,9 +65,9 @@ Please make sure to not use tab (\t) while editing yaml files. You may want to v
 	
 	#ServiceNow Version
 	serviceNowVersion: "Fuji"
-	
-	#Close notes text to be posted when resolving the incident
-        closeNotesText: "This incident is resolved"
+    
+    #Close notes text to be posted when resolving the incident
+    closeNotesText: "This incident is resolved"
 
 	#Proxy server URI
 	proxyUri:
